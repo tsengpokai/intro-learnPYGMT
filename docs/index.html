@@ -182,6 +182,66 @@ fig.show()
     </div>
   </section>
 
+  <!-- Tutorial: Plotting data points -->
+  <section id="plot-tutorial" class="max-w-7xl mx-auto px-4 pb-2">
+    <h2 class="text-2xl font-extrabold">官方教學精華：Plotting data points 🧪</h2>
+    <p class="mt-2 text-slate-300">摘自 PyGMT 官方 <em>Tutorials → Basics → Plotting data points</em>，示範如何把資料點（地震）用大小與顏色做視覺化，並顯示色條。</p>
+
+    <div class="grid md:grid-cols-2 gap-6 mt-4">
+      <div class="prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+        <h3 class="font-bold">1) 載入日本海溝地震資料（自帶資料集）</h3>
+<pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-python">import pygmt
+import numpy as np
+
+data = pygmt.datasets.load_sample_data(name="japan_quakes")  # pandas.DataFrame
+# 依資料邊界多留 1 度做 region
+region = [data.longitude.min()-1, data.longitude.max()+1,
+          data.latitude.min()-1,  data.latitude.max()+1]
+
+fig = pygmt.Figure()
+fig.basemap(region=region, projection="M15c", frame=True)
+fig.coast(land="black", water="skyblue")
+fig.plot(x=data.longitude, y=data.latitude, style="c0.3c", fill="white", pen="black")
+fig.show()
+</code></pre>
+        <p class="text-xs text-slate-400">小提示：第一次使用時會自動把檔案下載到 <code>~/.gmt/cache</code>。</p>
+      </div>
+
+      <div class="prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+        <h3 class="font-bold">2) 以震級調整大小、以深度映色 + 色條</h3>
+<pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-python">fig = pygmt.Figure()
+fig.basemap(region=region, projection="M15c", frame=True)
+fig.coast(land="black", water="skyblue")
+# 先建立色盤（深度最小 → 最大）
+pygmt.makecpt(cmap="viridis", series=[data.depth_km.min(), data.depth_km.max()])
+fig.plot(
+    x=data.longitude, y=data.latitude,
+    size=0.02 * (2**data.magnitude),  # 震級對數，取 2^M 強化差異
+    fill=data.depth_km, cmap=True, style="cc", pen="black")
+fig.colorbar(frame="xaf+lDepth (km)")
+fig.show()
+</code></pre>
+        <p class="text-xs text-slate-400">技巧：當 <code>style</code> 只給 <code>c</code> 與單位 <code>c</code> 時，大小改由 <code>size</code> 陣列控制。</p>
+      </div>
+    </div>
+
+    <div class="mt-4 prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+      <h3 class="font-bold">3) 輸出檔案</h3>
+<pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-python"># 以 300 dpi 輸出 PNG（或改為 PDF/SVG）
+fig.savefig("quakes_map.png", dpi=300)
+</code></pre>
+      <p class="text-xs text-slate-400">更多：<a class="text-sky-400" href="https://www.pygmt.org/latest/tutorials/basics/plot.html" target="_blank" rel="noopener">Plotting data points 教學頁</a></p>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <h3 class="font-bold">🎥 延伸：高解析地形圖實作影片</h3>
+      <p class="text-slate-300 text-sm">影片示範安裝與繪製高解析地形（earth relief）、色盤與輸出，適合初次入門。</p>
+      <div class="aspect-video w-full rounded-xl overflow-hidden">
+        <iframe class="w-full h-full" src="https://www.youtube.com/embed/r4hPYNVaExg" title="PyGMT high-resolution topographic map" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </section>
+
   <!-- Demos -->
   <section id="demos" class="max-w-7xl mx-auto px-4 py-10">
     <h2 class="text-2xl font-extrabold">互動展示 Interactive Demos ✨</h2>
@@ -272,9 +332,8 @@ fig.show()
   </section>
 
   <!-- Gallery -->
-  <section id="gallery" class="max-w-7xl mx-auto px-4 py-10">
-    <h2 class="text-2xl font-extrabold">圖庫 Gallery（你的 PyGMT 作品）🖼️</h2>
-    <p class="text-slate-300 mt-2">請把圖片放在 <code>assets/</code> 目錄。建議英文化檔名、無空白：<code>1111.png</code>、<code>wc_co2_flux.jpg</code>、<code>archi_sea.png</code>、<code>topography.png</code>。</p>
+  <section id=\"gallery\" class=\"max-w-7xl mx-auto px-4 py-10\">
+    <h2 class=\"text-2xl font-extrabold\">圖庫 Gallery（你的 PyGMT 作品）🖼️</h2>
 
     <div class="grid md:grid-cols-2 gap-6 mt-4">
       <figure class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
