@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyGMT Playground | 互動式介紹網站</title>
+  <meta name="description" content="一個美觀、可讀、可互動的 PyGMT 介紹網站。含安裝教學、快速上手、互動地圖、圖表與範例程式碼。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Highlight.js for code syntax -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());</script>
+  <!-- Mermaid for diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+  <!-- Chart.js for simple interactive charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Leaflet for interactive region demo -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root { --brand: 36 99% 50%; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,.08); }
+    .prose pre { position: relative; }
+    .copy-btn { position:absolute; top:.5rem; right:.5rem; }
+    .section-card { transition: transform .2s ease, box-shadow .2s ease; }
+    .section-card:hover { transform: translateY(-2px); box-shadow: 0 20px 35px rgba(0,0,0,.15);}    
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <!-- Sticky Navbar -->
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 glass">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-sky-400">
+          <path d="M12 2l3 6 6 .5-4.5 4 1.5 6.5L12 16l-6 3 1.5-6.5L3 8.5 9 8l3-6z" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <span class="font-extrabold tracking-tight text-lg">PyGMT Playground</span>
+      </div>
+      <nav class="hidden md:flex gap-5 ml-6 text-sm text-slate-300">
+        <a href="#overview" class="hover:text-white">總覽</a>
+        <a href="#install" class="hover:text-white">安裝</a>
+        <a href="#quickstart" class="hover:text-white">快速上手</a>
+        <a href="#demos" class="hover:text-white">互動展示</a>
+        <a href="#gallery" class="hover:text-white">圖庫</a>
+        <a href="#cheats" class="hover:text-white">Cheat Sheet</a>
+        <a href="#resources" class="hover:text-white">資源</a>
+      </nav>
+      <div class="ml-auto flex items-center gap-2">
+        <input id="site-search" type="search" placeholder="站內搜尋… (安裝/地形/投影/色盤)" class="w-52 hidden sm:block bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-sky-400" />
+        <button id="toggle-theme" class="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5">
+          <i data-lucide="moon"></i>
+          <span>暗色 / 亮色</span>
+        </button>
+        <a href="https://www.pygmt.org/latest/" target="_blank" class="inline-flex items-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-400 px-3 py-1.5 text-sm font-semibold">官方文件</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 pt-14 pb-10 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">用 <span class="text-sky-400">PyGMT</span> 把地球畫得更漂亮 🌎</h1>
+        <p class="mt-4 text-slate-300">PyGMT 是 GMT 的 Python 介面：把嚴謹的地球物理繪圖，變成 Pythonic 的優雅工作流。本頁示範 <b>可讀性</b>、<b>美觀</b>、<b>多功能</b> 的介紹網站樣板，附互動說明、圖表與程式碼。</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="#quickstart" class="rounded-2xl bg-sky-500 hover:bg-sky-400 px-4 py-2 font-semibold">開始使用</a>
+          <a href="#demos" class="rounded-2xl border border-white/10 hover:bg-white/5 px-4 py-2">看互動展示</a>
+        </div>
+        <p class="mt-4 text-xs text-slate-400">提示：你可以複製程式碼直接貼到 Jupyter/VS Code；或用 Colab/Binder 啟動環境。</p>
+      </div>
+      <!-- Decorative globe-like SVG -->
+      <div class="relative">
+        <svg viewBox="0 0 600 600" class="w-full drop-shadow-2xl">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="70%">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9"/>
+              <stop offset="70%" stop-color="#0ea5e9" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#0b1020" stop-opacity="0.0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="300" cy="300" r="250" fill="url(#g)"/>
+          <g stroke="#93c5fd" stroke-opacity=".35">
+            <!-- lat lines -->
+            <circle cx="300" cy="300" r="200" fill="none"/>
+            <circle cx="300" cy="300" r="150" fill="none"/>
+            <circle cx="300" cy="300" r="100" fill="none"/>
+            <circle cx="300" cy="300" r="50" fill="none"/>
+            <!-- lon lines -->
+            <path d="M300 50v500"/>
+            <path d="M150 90c150 210 150 210 300 0" fill="none"/>
+            <path d="M90 150c210 150 210 150 420 0" fill="none"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overview -->
+  <section id="overview" class="max-w-7xl mx-auto px-4 py-10">
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="section-card rounded-2xl border border-white/10 p-6 bg-white/5">
+        <h3 class="font-bold text-lg mb-2">為什麼選 PyGMT？</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">學術等級的地圖品質、完整的投影系統、地形與海深柵格 (earth relief)、等高線、顏色色盤、構造線、地震/火山資料集… 一套搞定。</p>
+      </div>
+      <div class="section-card rounded-2xl border border-white/10 p-6 bg-white/5">
+        <h3 class="font-bold text-lg mb-2">誰適合？</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">地球科學、海洋、環境、地理、地震學、火山學、地形學、遙測與任何需要 <i>出版級地圖</i> 的研究/教學/報告。</p>
+      </div>
+      <div class="section-card rounded-2xl border border-white/10 p-6 bg-white/5">
+        <h3 class="font-bold text-lg mb-2">本站特色</h3>
+        <ul class="text-slate-300 text-sm list-disc ml-5 space-y-1">
+          <li>暗/亮色主題、站內搜尋</li>
+          <li>互動地圖區塊 (選 region → 得到參數)</li>
+          <li>動態圖表 (解析度 vs 時間)</li>
+          <li>Mermaid 流程圖、可複製程式碼</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section id="install" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-extrabold">安裝 Installation</h2>
+    <p class="mt-2 text-slate-300">建議使用 <b>conda/mamba</b> 建立乾淨環境；或以 pip + GMT 預先安裝。</p>
+
+    <div class="grid md:grid-cols-2 gap-6 mt-4">
+      <article class="prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+        <h3>方式 A：mamba (推薦)</h3>
+        <pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-bash">mamba create -n pygmt -c conda-forge pygmt
+mamba activate pygmt
+python -c "import pygmt; print(pygmt.__version__)"</code></pre>
+        <p class="text-sm text-slate-400">此方法會自動帶入 GMT、GDAL、PROJ 等依賴。</p>
+      </article>
+      <article class="prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+        <h3>方式 B：pip</h3>
+        <pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-bash"># 先安裝 GMT（依平台不同）
+# macOS 可用 brew install gmt
+# Ubuntu apt-get install gmt gmt-dcw gmt-gshhg
+pip install pygmt
+python -c "import pygmt; print(pygmt.__version__)"</code></pre>
+        <p class="text-sm text-slate-400">若遇到動態函式庫問題，請確認 GMT 與 GDAL 版本相容。</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Quickstart -->
+  <section id="quickstart" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-extrabold">快速上手 Quick Start</h2>
+    <p class="mt-2 text-slate-300">以下範例示範：載入地形、著色、海岸線、色條與投影。把 code 複製到你的 Notebook 就能跑（需本地環境）。</p>
+
+    <div class="prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+<pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-python">import pygmt
+from pygmt.datasets import load_earth_relief
+
+# 1) 載入 15 角分解析度地形（更高解析度：'01m', '15s'）
+grid = load_earth_relief(resolution='15m', region=[119, 123.5, 21.5, 25.5])  # 台灣
+
+fig = pygmt.Figure()
+fig.grdimage(grid, cmap='geo', shading=True, frame=['af', '+t"Taiwan Topography"'])
+fig.coast(shorelines='1p,black', borders='1/0.5p,white', water='lightblue')
+fig.colorbar(frame='a1000')
+fig.show()
+</code></pre>
+      <details class="mt-2">
+        <summary class="cursor-pointer text-sky-300">常見參數備忘錄</summary>
+        <ul class="text-sm text-slate-300 list-disc ml-6">
+          <li><b>region</b> = [W, E, S, N]；<b>projection</b>='M10c' 地圖寬度 10 cm</li>
+          <li><b>cmap</b>：'geo', 'cool', 'topo', 'relief' 或自訂 CPT</li>
+          <li><b>grdimage</b>：地形上色；<b>grdcontour</b>：等高線</li>
+          <li><b>plot</b>：散點/線；<b>text</b>：文字；<b>inset</b>：插圖</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <!-- Interactive Demos -->
+  <section id="demos" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-extrabold">互動展示 Interactive Demos</h2>
+    <div class="grid lg:grid-cols-2 gap-6 mt-4">
+      <!-- Demo A: Leaflet region picker → prints PyGMT region parameter -->
+      <div class="rounded-2xl border border-white/10 p-4 bg-white/5">
+        <h3 class="font-bold mb-2">區域選擇器：自動產生 <code>region=[W,E,S,N]</code></h3>
+        <div id="map" class="h-72 rounded-xl overflow-hidden"></div>
+        <div class="mt-3 text-sm text-slate-300">拖曳或捏合地圖，點擊下方按鈕讀取目前視窗對應的 <code>region</code> 參數。</div>
+        <div class="mt-3 flex items-center gap-2">
+          <button id="btn-region" class="rounded-xl bg-sky-500 hover:bg-sky-400 px-3 py-1.5 text-sm font-semibold">取得 region</button>
+          <code id="region-out" class="text-xs bg-black/40 px-2 py-1 rounded">region=[120.0, 121.0, 23.0, 24.0]</code>
+        </div>
+      </div>
+
+      <!-- Demo B: Resolution vs. Render Time (simulated) -->
+      <div class="rounded-2xl border border-white/10 p-4 bg-white/5">
+        <h3 class="font-bold mb-2">解析度 vs 繪圖時間（模擬）</h3>
+        <p class="text-sm text-slate-300">高解析度更漂亮，但時間↑。拖動滑桿比較不同解析度的「預估時間」。</p>
+        <input id="res-slider" type="range" min="1" max="5" value="3" class="w-full" />
+        <div class="flex justify-between text-xs text-slate-400 mt-1">
+          <span>'60m'</span><span>'15m'</span><span>'05m'</span><span>'01m'</span><span>'15s'</span>
+        </div>
+        <canvas id="timeChart" class="mt-3"></canvas>
+        <p class="text-xs text-slate-400 mt-2">* 此處為教學示意，實際時間依 CPU/GMT 快取/硬碟而異。</p>
+      </div>
+    </div>
+
+    <!-- Demo C: Mermaid workflow -->
+    <div class="rounded-2xl border border-white/10 p-4 bg-white/5 mt-6">
+      <h3 class="font-bold mb-2">典型工作流</h3>
+      <div class="mermaid">
+        flowchart LR
+          A[設定環境<br/>conda/mamba] --> B[載入資料集<br/>earth_relief, quakes, volcanoes]
+          B --> C[選 region / projection / cmap]
+          C --> D[繪製: grdimage + coast + colorbar]
+          D --> E[疊加: plot/text/contour]
+          E --> F[輸出: PDF/PNG/SVG]
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-extrabold">圖庫 Gallery（概念示意）</h2>
+    <p class="text-slate-300 mt-2">以下為幾種常見的 PyGMT 圖型樣式示意（以 SVG 佔位可替換為你的成品圖）。</p>
+
+    <div class="grid md:grid-cols-3 gap-6 mt-4">
+      <!-- Card 1 -->
+      <div class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
+        <svg viewBox="0 0 400 240" class="rounded-xl bg-gradient-to-b from-sky-900 to-slate-900 w-full h-auto">
+          <rect x="0" y="180" width="400" height="60" fill="#0ea5e9" opacity=".6"></rect>
+          <path d="M0 160 C60 130 120 150 180 120 C230 95 260 100 320 80 C360 70 380 75 400 70" stroke="#93c5fd" fill="none" stroke-width="2"/>
+          <text x="14" y="26" fill="#e5e7eb" font-size="14">Topography + Coast + Colorbar</text>
+        </svg>
+        <div class="p-2 text-sm text-slate-300">地形著色 + 海岸線 + 色條</div>
+      </div>
+      <!-- Card 2 -->
+      <div class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
+        <svg viewBox="0 0 400 240" class="rounded-xl bg-gradient-to-b from-emerald-900 to-slate-900 w-full h-auto">
+          <circle cx="130" cy="80" r="5" fill="#34d399"/>
+          <circle cx="180" cy="120" r="4" fill="#34d399"/>
+          <circle cx="260" cy="70" r="6" fill="#34d399"/>
+          <circle cx="300" cy="160" r="5" fill="#34d399"/>
+          <text x="14" y="26" fill="#e5e7eb" font-size="14">Earthquakes / Volcanoes</text>
+        </svg>
+        <div class="p-2 text-sm text-slate-300">地震/火山散點圖（大小/顏色 = 震級/高度）</div>
+      </div>
+      <!-- Card 3 -->
+      <div class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
+        <svg viewBox="0 0 400 240" class="rounded-xl bg-gradient-to-b from-fuchsia-900 to-slate-900 w-full h-auto">
+          <path d="M0 200 L400 200" stroke="#e879f9" stroke-width="2"/>
+          <path d="M40 200 C80 120, 120 120, 160 200 S240 280, 280 200 S360 120, 400 200" stroke="#f0abfc" fill="none" stroke-width="3"/>
+          <text x="14" y="26" fill="#e5e7eb" font-size="14">Profiles / Transects</text>
+        </svg>
+        <div class="p-2 text-sm text-slate-300">剖面/截線：抽取地形高程或其他柵格數據</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cheat Sheet -->
+  <section id="cheats" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-extrabold">常用指令 Cheat Sheet</h2>
+    <div class="grid md:grid-cols-2 gap-6 mt-4">
+      <div class="prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+<pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-python">fig = pygmt.Figure()
+fig.basemap(region=[-90,-70,-20,10], projection='M12c', frame=['af', '+t"South America"'])
+fig.grdimage(load_earth_relief('15m'), cmap='geo', shading=True)
+fig.coast(shorelines='1p,black', borders=1)
+fig.colorbar(frame='a1000')
+fig.savefig('south_america.png', dpi=300)
+</code></pre>
+      </div>
+      <div class="prose prose-invert max-w-none border border-white/10 rounded-2xl p-4 bg-white/5">
+<pre><button class="copy-btn rounded-lg bg-white/10 px-2 py-1 text-xs">複製</button><code class="language-python"># 疊加散點：例如地震/火山
+import pandas as pd
+import numpy as np
+lat = [ -16.3, -0.6, -14.5 ]
+lon = [-71.5, -78.5, -67.8 ]
+size = [ 0.4, 0.6, 0.5 ] # cm
+fig.plot(x=lon, y=lat, style='c'+','.join(map(str,size)), color='red', pen='0.25p,black')
+fig.show()
+</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources -->
+  <section id="resources" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-extrabold">資源 Resources</h2>
+    <ul class="mt-2 grid md:grid-cols-2 gap-3 text-slate-300">
+      <li class="rounded-xl border border-white/10 bg-white/5 p-3">官方文件（Latest）：<a class="text-sky-400 hover:underline" href="https://www.pygmt.org/latest/" target="_blank" rel="noopener">pygmt.org/latest</a></li>
+      <li class="rounded-xl border border-white/10 bg-white/5 p-3">GMT 主站：<a class="text-sky-400 hover:underline" href="https://www.generic-mapping-tools.org/" target="_blank" rel="noopener">generic-mapping-tools.org</a></li>
+      <li class="rounded-xl border border-white/10 bg-white/5 p-3">範例畫廊：<a class="text-sky-400 hover:underline" href="https://www.pygmt.org/latest/gallery/index.html" target="_blank">Gallery</a></li>
+      <li class="rounded-xl border border-white/10 bg-white/5 p-3">發問/討論：<a class="text-sky-400 hover:underline" href="https://forum.generic-mapping-tools.org/" target="_blank">GMT Forum</a></li>
+      <li class="rounded-xl border border-white/10 bg-white/5 p-3">Try online：<a class="text-sky-400 hover:underline" href="https://mybinder.org/v2/gh/GenericMappingTools/pygmt/master?labpath=examples%2Fgallery%2Fmaps%2Findex.ipynb" target="_blank">Binder</a></li>
+      <li class="rounded-xl border border-white/10 bg-white/5 p-3">Colab（第三方）：<a class="text-sky-400 hover:underline" href="https://colab.research.google.com/" target="_blank">Google Colab</a></li>
+    </ul>
+  </section>
+
+  <footer class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-8 text-xs text-slate-400 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
+      <div>© <span id="year"></span> PyGMT Playground | Built with Tailwind · Mermaid · Chart.js · Leaflet</div>
+      <div>Made for education/demo. Replace SVGs with your PyGMT figures ✨</div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // icons
+    lucide.createIcons();
+
+    // theme toggle
+    const themeBtn = document.getElementById('toggle-theme');
+    const root = document.documentElement;
+    themeBtn?.addEventListener('click', () => {
+      if (root.classList.contains('light')) {
+        root.classList.remove('light');
+        document.body.classList.remove('bg-white', 'text-slate-900');
+        document.body.classList.add('bg-slate-950', 'text-slate-100');
+      } else {
+        root.classList.add('light');
+        document.body.classList.add('bg-white', 'text-slate-900');
+        document.body.classList.remove('bg-slate-950', 'text-slate-100');
+      }
+    });
+
+    // search filter (basic)
+    const searchInput = document.getElementById('site-search');
+    searchInput?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('section').forEach(sec => {
+        const text = sec.textContent.toLowerCase();
+        sec.style.opacity = q && !text.includes(q) ? 0.15 : 1;
+      });
+    });
+
+    // copy buttons
+    document.querySelectorAll('.prose pre').forEach(pre => {
+      const btn = pre.querySelector('.copy-btn');
+      const code = pre.querySelector('code');
+      btn?.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          btn.textContent = '已複製!';
+          setTimeout(() => (btn.textContent = '複製'), 1200);
+        } catch (err) { btn.textContent = '失敗'; }
+      });
+    });
+
+    // footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Leaflet map + region
+    const map = L.map('map', { scrollWheelZoom: true }).setView([23.7, 121], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 10, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+    const regionOut = document.getElementById('region-out');
+    document.getElementById('btn-region').addEventListener('click', () => {
+      const b = map.getBounds();
+      const W = +b.getWest().toFixed(3);
+      const E = +b.getEast().toFixed(3);
+      const S = +b.getSouth().toFixed(3);
+      const N = +b.getNorth().toFixed(3);
+      regionOut.textContent = `region=[${W}, ${E}, ${S}, ${N}]`;
+    });
+
+    // Chart.js simulated time vs resolution
+    const ctx = document.getElementById('timeChart');
+    const labels = ['60m','15m','05m','01m','15s'];
+    const base = [0.6, 1, 1.8, 3.5, 6.0]; // pretend seconds
+    const data = { labels, datasets: [{ label: '預估繪圖時間 (秒)', data: base, tension: .25 }] };
+    const chart = new Chart(ctx, { type: 'line', data, options: { plugins: { legend: { labels: { color: '#cbd5e1' } } }, scales: { x: { ticks: { color: '#cbd5e1' } }, y: { ticks: { color: '#cbd5e1' } } } } });
+    const slider = document.getElementById('res-slider');
+    slider.addEventListener('input', (e) => {
+      const factor = 0.6 + (e.target.value - 3) * 0.15; // simple scale
+      chart.data.datasets[0].data = base.map(v => +(v*factor).toFixed(2));
+      chart.update();
+    });
+  </script>
+</body>
+</html>
