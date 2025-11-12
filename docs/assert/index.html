@@ -45,6 +45,9 @@
     .light header, .light footer { background:#ffffffc7; }
     .light a { color:#0369a1; }
   </style>
+  <!-- JSZip for client-side ZIP generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100">
   <!-- Sticky Navbar -->
@@ -284,8 +287,8 @@ fig.show()
 
   <!-- Gallery -->
   <section id="gallery" class="max-w-7xl mx-auto px-4 py-10">
-    <h2 class="text-2xl font-extrabold">圖庫 Gallery（你的 PyGMT 作品）🖼️</h2>
-    <p class="text-slate-300 mt-2">下列示範直接嵌入你的成品影像。請將圖片放到 <code>assets/</code> 目錄（建議將檔名改成英文、無空白）。</p>
+    <h2 class="text-2xl font-extrabold flex items-center gap-3">圖庫 Gallery（你的 PyGMT 作品）🖼️ <button id="dl-pack" class="ml-auto rounded-xl bg-amber-500 hover:bg-amber-400 px-3 py-1.5 text-sm font-semibold">下載圖庫樣本 ZIP</button></h2>
+    <p class="text-slate-300 mt-2">下列示範直接嵌入你的成品影像。請將圖片放到 <code>assets/</code> 目錄（建議英文化命名：<code>1111.png</code>、<code>wc_co2_flux.jpg</code>、<code>archi_sea.png</code>、<code>topography.png</code>）（建議將檔名改成英文、無空白）。</p>
 
     <div class="grid md:grid-cols-2 gap-6 mt-4">
       <figure class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
@@ -293,7 +296,7 @@ fig.show()
         <figcaption class="p-2 text-sm text-slate-300">台灣地震深度分布（圓點著色 = 深度）</figcaption>
       </figure>
       <figure class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
-        <img src="assets/WC-CO2_flux_con_Rn_0.jpg" alt="CO2 flux map" class="rounded-xl w-full h-auto"/>
+        <img src="assets/wc_co2_flux.jpg" alt="CO2 flux map" class="rounded-xl w-full h-auto"/>
         <figcaption class="p-2 text-sm text-slate-300">地表 CO₂ 通量/氡/濃度疊圖（研究區示例）</figcaption>
       </figure>
       <figure class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
@@ -301,7 +304,7 @@ fig.show()
         <figcaption class="p-2 text-sm text-slate-300">群島海海岸線示意</figcaption>
       </figure>
       <figure class="section-card rounded-2xl border border-white/10 bg-white/5 p-3">
-        <img src="assets/地形圖.png" alt="Topography relief" class="rounded-xl w-full h-auto"/>
+        <img src="assets/topography.png" alt="Topography relief" class="rounded-xl w-full h-auto"/>
         <figcaption class="p-2 text-sm text-slate-300">高解析度地形著色（relief）</figcaption>
       </figure>
     </div>
@@ -565,6 +568,30 @@ python -c "import pygmt; print(pygmt.__version__)"`;
       }
     }
   } catch (e) { console.warn('D3-geo init failed', e); }
+// Download ZIP of gallery assets
+  (function(){
+    const btn = document.getElementById('dl-pack');
+    if(!btn) return;
+    const files = [
+      {name:'1111.png', url:'assets/1111.png'},
+      {name:'wc_co2_flux.jpg', url:'assets/wc_co2_flux.jpg'},
+      {name:'archi_sea.png', url:'assets/archi_sea.png'},
+      {name:'topography.png', url:'assets/topography.png'}
+    ];
+    btn.addEventListener('click', async ()=>{
+      const zip = new JSZip();
+      const folder = zip.folder('pygmt-gallery');
+      for(const f of files){
+        try {
+          const res = await fetch(f.url);
+          const blob = await res.blob();
+          folder.file(f.name, blob);
+        } catch(e) { console.warn('fetch failed:', f.url); }
+      }
+      const content = await zip.generateAsync({type:'blob'});
+      saveAs(content, 'pygmt_gallery_samples.zip');
+    });
+  })();
 </script>
 </body>
 </html>
