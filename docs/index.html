@@ -22,11 +22,9 @@
   
   <!-- Leaflet for interactive region demo -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- D3 + TopoJSON for real projections demo -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  <!-- D3 + TopoJSON for real projections demo -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json" type="application/json" id="world110"></script>
   <style>
     :root { --brand: 36 99% 50%; }
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
@@ -46,8 +44,6 @@
     .light a { color:#0369a1; }
   </style>
   <!-- JSZip for client-side ZIP generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100">
   <!-- Sticky Navbar -->
@@ -287,7 +283,7 @@ fig.show()
 
   <!-- Gallery -->
   <section id="gallery" class="max-w-7xl mx-auto px-4 py-10">
-    <h2 class="text-2xl font-extrabold flex items-center gap-3">圖庫 Gallery（你的 PyGMT 作品）🖼️ <button id="dl-pack" class="ml-auto rounded-xl bg-amber-500 hover:bg-amber-400 px-3 py-1.5 text-sm font-semibold">下載圖庫樣本 ZIP</button></h2>
+    <h2 class="text-2xl font-extrabold">圖庫 Gallery（你的 PyGMT 作品）🖼️</h2>
     <p class="text-slate-300 mt-2">下列示範直接嵌入你的成品影像。請將圖片放到 <code>assets/</code> 目錄（建議英文化命名：<code>1111.png</code>、<code>wc_co2_flux.jpg</code>、<code>archi_sea.png</code>、<code>topography.png</code>）（建議將檔名改成英文、無空白）。</p>
 
     <div class="grid md:grid-cols-2 gap-6 mt-4">
@@ -545,53 +541,37 @@ python -c "import pygmt; print(pygmt.__version__)"`;
       }
     });
     if(list) renderList();
-  // D3-geo: realtime projection preview
-  try {
-    const svg = d3.select('#d3map');
-    if (svg.node()) {
+  // D3-geo: realtime projection preview (fetch world atlas JSON)
+  (async function(){
+    try {
+      const svg = d3.select('#d3map');
+      if (!svg.node()) return;
       const g = svg.append('g');
       const graticule = d3.geoGraticule10();
-      const worldDataEl = document.getElementById('world110');
-      if (worldDataEl) {
-        const worldData = JSON.parse(worldDataEl.textContent);
-        const land = topojson.feature(worldData, worldData.objects.countries);
-        function drawD3(projName = 'geoNaturalEarth1') {
-          const proj = d3[projName]().fitExtent([[10, 10], [630, 350]], { type: 'Sphere' });
-          const path = d3.geoPath(proj);
-          g.selectAll('*').remove();
-          g.append('path').attr('d', path({ type: 'Sphere' })).attr('fill', '#0b1220');
-          g.append('path').attr('d', path(graticule)).attr('fill', 'none').attr('stroke', '#64748b').attr('stroke-opacity', .5).attr('stroke-width', .5);
-          g.append('path').attr('d', path(land)).attr('fill', '#22c55e').attr('stroke', '#0ea5e9').attr('stroke-width', .6).attr('fill-opacity', .8);
-        }
-        drawD3();
-        document.getElementById('d3proj')?.addEventListener('change', (e) => drawD3(e.target.value));
+      const worldData = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+      const land = topojson.feature(worldData, worldData.objects.countries);
+      function drawD3(projName='geoNaturalEarth1'){
+        const proj = d3[projName]().fitExtent([[10,10],[630,350]], {type:'Sphere'});
+        const path = d3.geoPath(proj);
+        g.selectAll('*').remove();
+        g.append('path').attr('d', path({type:'Sphere'})).attr('fill', '#0b1220');
+        g.append('path').attr('d', path(graticule)).attr('fill', 'none').attr('stroke', '#64748b').attr('stroke-opacity', .5).attr('stroke-width', .5);
+        g.append('path').attr('d', path(land)).attr('fill', '#22c55e').attr('stroke', '#0ea5e9').attr('stroke-width', .6).attr('fill-opacity', .8);
+      }
+      drawD3();
+      document.getElementById('d3proj')?.addEventListener('change', (e)=> drawD3(e.target.value));
+    } catch (e) {
+      console.warn('D3-geo init failed', e);
+      const holder = document.getElementById('d3map');
+      if(holder){
+        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+        t.setAttribute('x','16'); t.setAttribute('y','28'); t.setAttribute('fill','#94a3b8');
+        t.textContent = '❗ 無法載入世界地圖資料（CDN 或網路問題）';
+        holder.appendChild(t);
       }
     }
-  } catch (e) { console.warn('D3-geo init failed', e); }
-// Download ZIP of gallery assets
-  (function(){
-    const btn = document.getElementById('dl-pack');
-    if(!btn) return;
-    const files = [
-      {name:'1111.png', url:'assets/1111.png'},
-      {name:'wc_co2_flux.jpg', url:'assets/wc_co2_flux.jpg'},
-      {name:'archi_sea.png', url:'assets/archi_sea.png'},
-      {name:'topography.png', url:'assets/topography.png'}
-    ];
-    btn.addEventListener('click', async ()=>{
-      const zip = new JSZip();
-      const folder = zip.folder('pygmt-gallery');
-      for(const f of files){
-        try {
-          const res = await fetch(f.url);
-          const blob = await res.blob();
-          folder.file(f.name, blob);
-        } catch(e) { console.warn('fetch failed:', f.url); }
-      }
-      const content = await zip.generateAsync({type:'blob'});
-      saveAs(content, 'pygmt_gallery_samples.zip');
-    });
   })();
+
 </script>
 </body>
 </html>
